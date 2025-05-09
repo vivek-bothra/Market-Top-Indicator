@@ -30,3 +30,4 @@ Exit: You exit when a potential market top is signaled by an EMA crossover, with
 
 Risk Management: The ATR-based stop-loss protects against sudden drops, adapting to market volatility.
 
+results - https://in.tradingview.com/chart/SPX/oaWQMXXV-Market-Top-Detection-and-Capital-Protection-System/
