@@ -1,75 +1,46 @@
-//@version=6
-
+//@version=5
 strategy("Market Top Detector", overlay=true)
 
 // Inputs for customization
-
 ema_short_period = input.int(10, title="Short EMA Period")
-
 ema_long_period = input.int(20, title="Long EMA Period")
-
 macd_short = input.int(12, title="MACD Short Period")
-
 macd_long = input.int(26, title="MACD Long Period")
-
 macd_signal = input.int(9, title="MACD Signal Period")
-
 rsi_period = input.int(14, title="RSI Period")
-
 rsi_overbought = input.float(70, title="RSI Overbought Level")
-
 atr_period = input.int(14, title="ATR Period")
-
 atr_multiplier = input.float(2.0, title="ATR Multiplier for Stop-Loss")
 
 // Calculate indicators
-
 ema_short = ta.ema(close, ema_short_period)
-
 ema_long = ta.ema(close, ema_long_period)
-
 [macd_line, signal_line, _] = ta.macd(close, macd_short, macd_long, macd_signal)
-
 rsi = ta.rsi(close, rsi_period)
-
 atr = ta.atr(atr_period)
 
 // Plot EMAs on the chart
-
 plot(ema_short, color=color.blue, title="EMA Short")
-
 plot(ema_long, color=color.red, title="EMA Long")
 
 // Define entry and exit conditions
-
 enter_long = ema_short > ema_long and macd_line > signal_line
-
 exit_signal = ema_short < ema_long and (macd_line < signal_line or rsi > rsi_overbought)
 
 // Manage positions
-
 var float stop_level = na
-
 if strategy.position_size == 0 and enter_long
-
-strategy.entry("Long", strategy.long)
-
-stop_level := close - atr_multiplier * atr
+    strategy.entry("Long", strategy.long)
+    stop_level := close - atr_multiplier * atr
 
 if strategy.position_size > 0
-
-if exit_signal
-
-strategy.close("Long", comment="Exit Signal")
-
-strategy.exit("Stop Loss", "Long", stop=stop_level)
+    if exit_signal
+        strategy.close("Long", comment="Exit Signal")
+    strategy.exit("Stop Loss", "Long", stop=stop_level)
 
 // Background Color Logic
-
 bgcolor(strategy.position_size > 0 ? color.new(color.green, 90) : color.new(color.red, 90))
 
 // Plot signals for visualization
-
 plotshape(enter_long and strategy.position_size == 0, title="Buy Signal", location=location.belowbar, color=color.green, style=shape.triangleup, size=size.small)
-
 plotshape(exit_signal and strategy.position_size > 0, title="Sell Signal", location=location.abovebar, color=color.red, style=shape.triangledown, size=size.small)
