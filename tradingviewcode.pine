@@ -8,7 +8,6 @@ macd_short = input.int(12, title="MACD Short Period")
 macd_long = input.int(26, title="MACD Long Period")
 macd_signal = input.int(9, title="MACD Signal Period")
 rsi_period = input.int(14, title="RSI Period")
-rsi_overbought = input.float(70, title="RSI Overbought Level")
 atr_period = input.int(14, title="ATR Period")
 atr_multiplier = input.float(2.0, title="ATR Multiplier for Stop-Loss")
 
@@ -19,13 +18,24 @@ ema_long = ta.ema(close, ema_long_period)
 rsi = ta.rsi(close, rsi_period)
 atr = ta.atr(atr_period)
 
+priceHighRecent = ta.highest(close, 5)
+priceHighPrev = ta.highest(close[5], 5)
+rsiHighRecent = ta.highest(rsi, 5)
+rsiHighPrev = ta.highest(rsi[5], 5)
+rsi_divergence = priceHighRecent > priceHighPrev and rsiHighRecent < rsiHighPrev
+
+rsi_slope = rsi - rsi[3]
+rsi_weakening = rsi > 55 and rsi_slope < -6
+rsi_warning = rsi_divergence or rsi_weakening
+
 // Plot EMAs on the chart
 plot(ema_short, color=color.blue, title="EMA Short")
 plot(ema_long, color=color.red, title="EMA Long")
 
 // Define entry and exit conditions
 enter_long = ema_short > ema_long and macd_line > signal_line
-exit_signal = ema_short < ema_long and (macd_line < signal_line or rsi > rsi_overbought)
+watch_signal = ema_short > ema_long and (macd_line < signal_line or rsi_warning)
+exit_signal = ema_short < ema_long and (macd_line < signal_line or rsi_warning)
 
 // Manage positions
 var float stop_level = na
@@ -44,3 +54,4 @@ bgcolor(strategy.position_size > 0 ? color.new(color.green, 90) : color.new(colo
 // Plot signals for visualization
 plotshape(enter_long and strategy.position_size == 0, title="Buy Signal", location=location.belowbar, color=color.green, style=shape.triangleup, size=size.small)
 plotshape(exit_signal and strategy.position_size > 0, title="Sell Signal", location=location.abovebar, color=color.red, style=shape.triangledown, size=size.small)
+plotshape(watch_signal and strategy.position_size == 0, title="Watch Signal", location=location.abovebar, color=color.orange, style=shape.circle, size=size.tiny)

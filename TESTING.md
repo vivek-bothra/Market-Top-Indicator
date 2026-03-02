@@ -23,9 +23,9 @@
 
 ## UI / UX
 - [ ] All 13 market cards render
-- [ ] Signal badges correct color (LONG=lime, WATCH=amber, FLAT=red)
-- [ ] 1px left border color matches signal
-- [ ] Sparklines render for all cards
+- [ ] Signal badges correct color (LONG=lime, WATCH=amber, FLAT=muted red outline)
+- [ ] LONG/WATCH use 2px left border with tint backgrounds; FLAT uses dim 1px border
+- [ ] Sparklines render at 100×36 with 2px stroke and subtle gradient fill
 - [ ] FLAT cards don't show entry/stop/return rows
 - [ ] Filter bar: LONG/WATCH/FLAT/ALL filters work correctly
 - [ ] Filter count badges update correctly
@@ -36,7 +36,7 @@
 ## Responsive
 - [ ] Desktop 1280px: 3-4 column grid
 - [ ] Tablet 768px: 2 columns
-- [ ] Mobile 375px: 1 column
+- [ ] Mobile 375px: sparkline moves below price and indicators expand on tap
 - [ ] Header stays readable at all sizes
 - [ ] Filter bar wraps cleanly on mobile
 
