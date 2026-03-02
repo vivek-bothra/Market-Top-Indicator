@@ -1,6 +1,6 @@
 # Market Top Indicator Dashboard
 
-Single-page, zero-build dashboard for GitHub Pages that tracks a weekly "Market Top Detector" strategy across 13 diversified global equity indexes.
+Single-page, zero-build dashboard for GitHub Pages that tracks a weekly "Market Top Detector" strategy across 14 diversified global equity indexes.
 
 ## Deploy (GitHub Pages)
 
@@ -41,11 +41,18 @@ Entry is recorded when state transitions from non-LONG to LONG.
 
 ## Automation
 
-A weekly workflow runs Mondays at 09:00 UTC:
+A weekly workflow runs Mondays at 09:00 UTC (and can be started manually via `workflow_dispatch`):
 
 - File: `.github/workflows/weekly-refresh.yml`
 - Script: `scripts/fetch_signals.py`
 - Output: `data/signals.json`
+
+
+## South Korea market
+
+The dashboard also tracks:
+
+- `^KS11` as **KOSPI (South Korea)**
 
 ## India market note
 

@@ -21,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install yfinance pandas numpy
+        run: pip install -r requirements.txt
 
       - name: Generate signals
         run: python scripts/fetch_signals.py
