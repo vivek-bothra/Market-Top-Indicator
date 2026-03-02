@@ -532,7 +532,7 @@
         const detail = m.signal === 'FLAT'
           ? `<div class="detail muted">No active position.</div>`
           : `<div class="detail"><div class="mobile-inline">Entry ${m.entry_date} / Stop ${formatNum(m.stop_loss)}</div><div>Entry&nbsp;&nbsp;${m.entry_date} @ ${formatNum(m.entry_price)}</div><div>Stop&nbsp;&nbsp;&nbsp;${formatNum(m.stop_loss)}&nbsp;&nbsp;&nbsp;Return ${m.return_pct>=0?'+':''}${formatNum(m.return_pct)}%${durationText}</div></div>`;
-        const rsiLabel = m.rsi_divergence ? '<span class="rsi-warn">RSI ⚡ DIV</span>' : (m.rsi_weakening ? '<span class="rsi-warn">RSI ↘ SLOPE</span>' : `RSI ${formatNum(m.rsi,0)}`);
+        const rsiLabel = m.rsi_divergence ? '<span class="rsi-warn">RSI ⚡ DIV</span>' : (m.rsi_weakening ? '<span class="rsi-warn">RSI ↘ SLOPE</span>' : `RSI ✓ STABLE (${formatNum(m.rsi,0)})`);
         const sparkColor = m.signal === 'FLAT' ? 'var(--accent-flat-spark)' : `var(--accent-${s})`;
         const gradientId = `spark-${m.ticker.replace(/[^a-zA-Z0-9]/g,'')}`;
         return `<article class="card ${s}">
