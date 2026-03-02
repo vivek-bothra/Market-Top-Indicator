@@ -46,7 +46,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 118
     },
     {
       "ticker": "^IXIC",
@@ -92,7 +93,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 139
     },
     {
       "ticker": "^RUT",
@@ -138,7 +140,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": null
     },
     {
       "ticker": "^STOXX50E",
@@ -184,7 +187,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 90
     },
     {
       "ticker": "^GDAXI",
@@ -230,7 +234,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 104
     },
     {
       "ticker": "^FTSE",
@@ -276,7 +281,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": null
     },
     {
       "ticker": "^FCHI",
@@ -322,7 +328,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 83
     },
     {
       "ticker": "^N225",
@@ -368,7 +375,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 125
     },
     {
       "ticker": "^HSI",
@@ -414,7 +422,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": null
     },
     {
       "ticker": "^AXJO",
@@ -460,7 +469,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 76
     },
     {
       "ticker": "^NSEI",
@@ -506,7 +516,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 97
     },
     {
       "ticker": "NIFTYSMLCAP250.NS",
@@ -552,7 +563,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": 132
     },
     {
       "ticker": "^BVSP",
@@ -598,7 +610,8 @@
       "rsi_divergence": false,
       "rsi_weakening": false,
       "rsi_slope": 0.0,
-      "rsi_warning": false
+      "rsi_warning": false,
+      "signal_age_days": null
     },
     {
       "ticker": "^KS11",
@@ -625,7 +638,8 @@
       "atr": 0.0,
       "sparkline": [
         0.0
-      ]
+      ],
+      "signal_age_days": null
     }
   ]
 }
