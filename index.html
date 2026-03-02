@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Top Signals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #222222;
+      --text-primary: #e8e8e0;
+      --text-muted: #666660;
+      --accent-long: #c8f060;
+      --accent-watch: #f0a030;
+      --accent-flat: #ff4444;
+      --accent-long-dim: #1a2010;
+      --accent-watch-dim: #201808;
+      --accent-flat-dim: #1a0808;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: "IBM Plex Mono", monospace;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .topline {
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      letter-spacing: 0.03em;
+    }
+
+    .meta {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .badge {
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      font-size: 0.74rem;
+    }
+    .badge.live { color: var(--accent-watch); border-color: var(--accent-watch); }
+    .badge.cached { color: var(--accent-long); border-color: var(--accent-long); }
+
+    .methodology {
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--border);
+    }
+
+    .filter-bar {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 7px 11px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.78rem;
+    }
+
+    .filter-btn.active[data-filter="all"] { color: var(--text-primary); border-color: var(--text-primary); }
+    .filter-btn.active[data-filter="LONG"] { color: var(--accent-long); border-color: var(--accent-long); }
+    .filter-btn.active[data-filter="WATCH"] { color: var(--accent-watch); border-color: var(--accent-watch); }
+    .filter-btn.active[data-filter="FLAT"] { color: var(--accent-flat); border-color: var(--accent-flat); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 14px;
+      min-height: 210px;
+      border-left: 1px solid var(--border);
+      position: relative;
+    }
+    .card.long { background: var(--accent-long-dim); border-left-color: var(--accent-long); }
+    .card.watch { background: var(--accent-watch-dim); border-left-color: var(--accent-watch); }
+    .card.flat { background: var(--accent-flat-dim); border-left-color: var(--accent-flat); }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+      padding-right: 90px;
+    }
+    .market-name { font-weight: 500; font-size: 0.93rem; }
+    .ticker { color: var(--text-muted); font-size: 0.75rem; }
+
+    .signal {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .signal.long { background: var(--accent-long); color: var(--bg); }
+    .signal.watch { background: var(--accent-watch); color: var(--bg); }
+    .signal.flat { color: var(--accent-flat); border-color: var(--accent-flat); }
+
+    .sparkline {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 80px;
+      height: 28px;
+    }
+
+    .price-row {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    .price { font-size: 1.05rem; font-weight: 700; }
+    .chg.up { color: var(--accent-long); }
+    .chg.down { color: var(--accent-flat); }
+
+    .sep {
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+
+    .detail, .indicators {
+      font-size: 0.75rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .muted { color: var(--text-muted); }
+
+    .skeleton {
+      animation: pulse 1.4s ease infinite;
+      background: linear-gradient(90deg, #141414, #1b1b1b, #141414);
+      background-size: 200% 100%;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.5; }
+    }
+
+    .retry {
+      margin-top: 10px;
+      background: transparent;
+      border: 1px solid var(--accent-flat);
+      color: var(--accent-flat);
+      font-family: inherit;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    footer {
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topline">TANKRICH</div>
+    <h1>MARKET TOP SIGNALS</h1>
+    <div class="meta">
+      <span id="updated">↻ UPDATED --</span>
+      <span id="sourceBadge" class="badge live">LIVE DATA</span>
+      <span id="loadingText">Loading markets... (0/13)</span>
+      <a class="methodology" href="#method">Methodology</a>
+    </div>
+
+    <div class="filter-bar" id="filters"></div>
+    <section class="grid" id="grid"></section>
+
+    <footer id="method">
+      <div>Signals auto-generated every Monday 09:00 UTC.</div>
+      <div>Data: Yahoo Finance (unofficial) · Strategy: EMA/MACD/RSI Market Top Detector.</div>
+      <div>⚠ NIFTY 50 used as India broad market proxy — NIFTY 500 not available via Yahoo Finance.</div>
+      <div>Not financial advice. For educational purposes only.</div>
+    </footer>
+  </main>
+
+  <script>
+    const MARKETS = [
+      { ticker: '^GSPC', name: 'S&P 500', region: 'USA', flag: '🇺🇸', currency: 'USD' },
+      { ticker: '^IXIC', name: 'NASDAQ Composite', region: 'USA', flag: '🇺🇸', currency: 'USD' },
+      { ticker: '^RUT', name: 'Russell 2000', region: 'USA', flag: '🇺🇸', currency: 'USD' },
+      { ticker: '^STOXX50E', name: 'Euro Stoxx 50', region: 'Eurozone', flag: '🇪🇺', currency: 'EUR' },
+      { ticker: '^GDAXI', name: 'DAX', region: 'Germany', flag: '🇩🇪', currency: 'EUR' },
+      { ticker: '^FTSE', name: 'FTSE 100', region: 'UK', flag: '🇬🇧', currency: 'GBP' },
+      { ticker: '^FCHI', name: 'CAC 40', region: 'France', flag: '🇫🇷', currency: 'EUR' },
+      { ticker: '^N225', name: 'Nikkei 225', region: 'Japan', flag: '🇯🇵', currency: 'JPY' },
+      { ticker: '^HSI', name: 'Hang Seng', region: 'Hong Kong', flag: '🇭🇰', currency: 'HKD' },
+      { ticker: '^AXJO', name: 'ASX 200', region: 'Australia', flag: '🇦🇺', currency: 'AUD' },
+      { ticker: '^NSEI', name: 'NIFTY 50 (India Broad Proxy)', region: 'India', flag: '🇮🇳', currency: 'INR' },
+      { ticker: 'NIFTYSMLCAP250.NS', name: 'NIFTY Smallcap 250', region: 'India', flag: '🇮🇳', currency: 'INR' },
+      { ticker: '^BVSP', name: 'Bovespa', region: 'Brazil', flag: '🇧🇷', currency: 'BRL' }
+    ];
+
+    const grid = document.getElementById('grid');
+    const loadingText = document.getElementById('loadingText');
+    const updatedEl = document.getElementById('updated');
+    const sourceBadge = document.getElementById('sourceBadge');
+
+    let allMarkets = [];
+    let activeFilter = 'all';
+
+    function todayKey() { return new Date().toISOString().slice(0, 10); }
+
+    function ema(values, period) {
+      const k = 2 / (period + 1);
+      const result = [values[0]];
+      for (let i = 1; i < values.length; i++) {
+        result.push(values[i] * k + result[i - 1] * (1 - k));
+      }
+      return result;
+    }
+
+    function rsiWilder(values, period = 14) {
+      const out = Array(values.length).fill(null);
+      let gains = 0, losses = 0;
+      for (let i = 1; i <= period; i++) {
+        const d = values[i] - values[i - 1];
+        gains += Math.max(d, 0);
+        losses += Math.max(-d, 0);
+      }
+      let avgGain = gains / period;
+      let avgLoss = losses / period;
+      out[period] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+      for (let i = period + 1; i < values.length; i++) {
+        const d = values[i] - values[i - 1];
+        avgGain = ((avgGain * (period - 1)) + Math.max(d, 0)) / period;
+        avgLoss = ((avgLoss * (period - 1)) + Math.max(-d, 0)) / period;
+        out[i] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+      }
+      return out;
+    }
+
+    function atrWilder(high, low, close, period = 14) {
+      const tr = [high[0] - low[0]];
+      for (let i = 1; i < close.length; i++) {
+        tr.push(Math.max(high[i] - low[i], Math.abs(high[i] - close[i - 1]), Math.abs(low[i] - close[i - 1])));
+      }
+      const atr = Array(close.length).fill(null);
+      let sum = 0;
+      for (let i = 0; i < period; i++) sum += tr[i];
+      atr[period - 1] = sum / period;
+      for (let i = period; i < tr.length; i++) {
+        atr[i] = ((atr[i - 1] * (period - 1)) + tr[i]) / period;
+      }
+      return atr;
+    }
+
+    function normaliseSpark(values) {
+      const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
+      return values.map((v, i) => `${(i / (values.length - 1)) * 80},${28 - ((v - min) / span) * 28}`).join(' ');
+    }
+
+    function buildSignalSeries(close, high, low) {
+      const e10 = ema(close, 10);
+      const e20 = ema(close, 20);
+      const e12 = ema(close, 12);
+      const e26 = ema(close, 26);
+      const macd = e12.map((v, i) => v - e26[i]);
+      const macdSig = ema(macd, 9);
+      const rsi = rsiWilder(close, 14);
+      const atr = atrWilder(high, low, close, 14);
+      const warmup = 52;
+      let lastState = 'FLAT';
+      let entry = null;
+
+      for (let i = warmup; i < close.length; i++) {
+        const isLong = e10[i] > e20[i] && macd[i] > macdSig[i];
+        const isWatch = e10[i] > e20[i] && (macd[i] < macdSig[i] || rsi[i] > 70);
+        const state = isLong ? 'LONG' : (isWatch ? 'WATCH' : 'FLAT');
+        if (state === 'LONG' && lastState !== 'LONG') {
+          entry = { idx: i, price: close[i], atr: atr[i] };
+        }
+        lastState = state;
+      }
+
+      const i = close.length - 1;
+      const isLong = e10[i] > e20[i] && macd[i] > macdSig[i];
+      const isWatch = e10[i] > e20[i] && (macd[i] < macdSig[i] || rsi[i] > 70);
+      const signal = isLong ? 'LONG' : (isWatch ? 'WATCH' : 'FLAT');
+
+      const current = {
+        signal,
+        ema_short: e10[i],
+        ema_long: e20[i],
+        rsi: rsi[i],
+        macd_line: macd[i],
+        macd_signal: macdSig[i],
+        atr: atr[i],
+        entry_price: null,
+        entry_date: null,
+        stop_loss: null,
+        return_pct: null,
+      };
+
+      if ((signal === 'LONG' || signal === 'WATCH') && entry) {
+        current.entry_price = entry.price;
+        current.entry_date = new Date(close.timestamps ? close.timestamps[entry.idx] * 1000 : Date.now()).toISOString().slice(0, 10);
+        current.stop_loss = entry.price - (2 * entry.atr);
+        current.return_pct = ((close[i] - entry.price) / entry.price) * 100;
+      }
+
+      return current;
+    }
+
+    function validateBars(rows) {
+      if (!rows || rows.length < 52) return false;
+      let badSeq = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        if (!Number.isFinite(r.close) || r.close === 0) {
+          badSeq++; if (badSeq > 3) return false;
+        } else badSeq = 0;
+        if (i > 0 && r.ts <= rows[i - 1].ts) return false;
+      }
+      return true;
+    }
+
+    async function attempt(url) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) return null;
+        return await res.text();
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function parseV8(text) {
+      const data = JSON.parse(text);
+      const result = data?.chart?.result?.[0];
+      if (!result) return null;
+      const q = result.indicators.quote[0];
+      const t = result.timestamp;
+      const rows = t.map((ts, i) => ({ ts, open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i], volume: q.volume[i] }));
+      return rows;
+    }
+
+    function parseV7(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 3) return null;
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const [date, open, high, low, close, adj, volume] = lines[i].split(',');
+        if (!date || close === 'null') continue;
+        rows.push({ ts: Math.floor(new Date(date + 'T00:00:00Z').getTime() / 1000), open: +open, high: +high, low: +low, close: +close, volume: +volume, adj: +adj });
+      }
+      return rows;
+    }
+
+    async function fetchWithFallback(ticker) {
+      const now = Math.floor(Date.now() / 1000);
+      const twoY = now - (2 * 365 * 24 * 60 * 60);
+      const endpoints = [
+        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1wk&range=2y`,
+        `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1wk&range=2y`,
+        `https://query1.finance.yahoo.com/v7/finance/download/${encodeURIComponent(ticker)}?interval=1wk&period1=${twoY}&period2=${now}&events=history`
+      ];
+      const prox = [
+        (u) => u,
+        (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        (u) => `https://thingproxy.freeboard.io/fetch/${u}`
+      ];
+
+      for (const ep of endpoints) {
+        for (const p of prox) {
+          const url = p(ep);
+          console.log('attempt', ticker, url);
+          const text = await attempt(url);
+          if (!text) continue;
+          try {
+            const rows = ep.includes('/v7/') ? parseV7(text) : parseV8(text);
+            if (validateBars(rows)) return rows;
+          } catch (e) {
+            console.warn('parse failed', ticker, e);
+          }
+        }
+      }
+      return null;
+    }
+
+    function formatNum(v, digits = 2) {
+      return Number(v).toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    }
+
+    function renderFilters() {
+      const counts = {
+        all: allMarkets.length,
+        LONG: allMarkets.filter(m => m.signal === 'LONG').length,
+        WATCH: allMarkets.filter(m => m.signal === 'WATCH').length,
+        FLAT: allMarkets.filter(m => m.signal === 'FLAT').length,
+      };
+      const rows = [
+        ['all', `ALL ${counts.all}`],
+        ['LONG', `● LONG ${counts.LONG}`],
+        ['WATCH', `◐ WATCH ${counts.WATCH}`],
+        ['FLAT', `○ FLAT ${counts.FLAT}`],
+      ];
+      const el = document.getElementById('filters');
+      el.innerHTML = rows.map(([key, label]) => `<button class="filter-btn ${activeFilter===key?'active':''}" data-filter="${key}">[ ${label} ]</button>`).join('');
+      el.querySelectorAll('button').forEach(btn => btn.onclick = () => { activeFilter = btn.dataset.filter; renderCards(); renderFilters(); });
+    }
+
+    function renderCards() {
+      const visible = activeFilter === 'all' ? allMarkets : allMarkets.filter(m => m.signal === activeFilter);
+      grid.innerHTML = visible.map(m => {
+        if (m.error) {
+          return `<article class="card flat"><div class="market-name">${m.flag} ${m.name}</div><div class="ticker">${m.ticker} · ${m.region}</div><div class="sep"></div><div class="detail" style="color:var(--accent-flat)">⚠ DATA UNAVAILABLE</div><button class="retry" data-ticker="${m.ticker}">↻ RETRY</button></article>`;
+        }
+        const s = m.signal.toLowerCase();
+        const chgClass = m.weekly_change_pct >= 0 ? 'up' : 'down';
+        const spark = normaliseSpark(m.sparkline);
+        const detail = m.signal === 'FLAT'
+          ? `<div class="detail muted">No active position.</div>`
+          : `<div class="detail"><div>Entry&nbsp;&nbsp;${m.entry_date} @ ${formatNum(m.entry_price)}</div><div>Stop&nbsp;&nbsp;&nbsp;${formatNum(m.stop_loss)}&nbsp;&nbsp;&nbsp;Return ${m.return_pct>=0?'+':''}${formatNum(m.return_pct)}%</div></div>`;
+        return `<article class="card ${s}">
+          <svg class="sparkline" viewBox="0 0 80 28"><line x1="0" y1="14" x2="80" y2="14" stroke="var(--border)" stroke-width="1"/><polyline points="${spark}" fill="none" stroke="var(--accent-${s})" stroke-width="1.5"/></svg>
+          <div class="card-top">
+            <div><div class="market-name">${m.flag} ${m.name}</div><div class="ticker">${m.ticker} · ${m.region}</div></div>
+            <span class="signal ${s}">${m.signal}</span>
+          </div>
+          <div class="price-row"><div class="price">${formatNum(m.current_price)} ${m.currency}</div><div class="chg ${chgClass}">${m.weekly_change_pct>=0?'▲':'▼'} ${m.weekly_change_pct>=0?'+':''}${formatNum(m.weekly_change_pct)}% this week</div></div>
+          <div class="sep"></div>
+          ${detail}
+          <div class="sep"></div>
+          <div class="indicators">EMA10 ${formatNum(m.ema_short,0)} · EMA20 ${formatNum(m.ema_long,0)} · RSI ${formatNum(m.rsi,0)}</div>
+        </article>`;
+      }).join('');
+
+      grid.querySelectorAll('.retry').forEach(btn => {
+        btn.onclick = async () => {
+          const ticker = btn.dataset.ticker;
+          const idx = allMarkets.findIndex(m => m.ticker === ticker);
+          const rows = await fetchWithFallback(ticker);
+          if (!rows) return;
+          allMarkets[idx] = buildMarketFromRows(MARKETS.find(m => m.ticker===ticker), rows);
+          renderFilters(); renderCards();
+        };
+      });
+    }
+
+    function buildMarketFromRows(meta, rows) {
+      const close = rows.map(r => r.close);
+      close.timestamps = rows.map(r => r.ts);
+      const high = rows.map(r => r.high);
+      const low = rows.map(r => r.low);
+      const sig = buildSignalSeries(close, high, low);
+      const current = close.at(-1);
+      const prev = close.at(-2) || current;
+      return {
+        ...meta,
+        ...sig,
+        current_price: current,
+        weekly_change_pct: ((current - prev) / prev) * 100,
+        sparkline: close.slice(-20),
+      };
+    }
+
+    async function loadSignalsJSON() {
+      try {
+        const res = await fetch('./data/signals.json', { cache: 'no-store' });
+        if (!res.ok) return null;
+        const json = await res.json();
+        const gen = new Date(json.generated_at);
+        if (Date.now() - gen.getTime() > 8 * 24 * 60 * 60 * 1000) return null;
+        return json;
+      } catch {
+        return null;
+      }
+    }
+
+    function renderSkeletons() {
+      grid.innerHTML = Array.from({ length: 9 }).map(() => `<article class="card skeleton"></article>`).join('');
+    }
+
+    async function loadLive() {
+      const cacheDate = todayKey();
+      let done = 0;
+      const results = [];
+      for (let i = 0; i < MARKETS.length; i += 3) {
+        const batch = MARKETS.slice(i, i + 3);
+        const data = await Promise.all(batch.map(async (meta) => {
+          const key = `tankrich_${meta.ticker}_${cacheDate}`;
+          const cached = sessionStorage.getItem(key);
+          if (cached) {
+            done++; loadingText.textContent = `Loading markets... (${done}/13)`;
+            return JSON.parse(cached);
+          }
+          const rows = await fetchWithFallback(meta.ticker);
+          done++; loadingText.textContent = `Loading markets... (${done}/13)`;
+          if (!rows) return { ...meta, signal: 'FLAT', error: true };
+          const market = buildMarketFromRows(meta, rows);
+          sessionStorage.setItem(key, JSON.stringify(market));
+          return market;
+        }));
+        results.push(...data);
+        if (i + 3 < MARKETS.length) await new Promise(r => setTimeout(r, 500));
+      }
+      sessionStorage.setItem(`tankrich_signals_${cacheDate}`, JSON.stringify({ markets: results, generated_at: new Date().toISOString() }));
+      return results;
+    }
+
+    async function init() {
+      renderSkeletons();
+      const json = await loadSignalsJSON();
+      if (json) {
+        allMarkets = json.markets;
+        const d = new Date(json.generated_at);
+        sourceBadge.textContent = `CACHED · ${d.toUTCString().slice(0, 16).toUpperCase()}`;
+        sourceBadge.className = 'badge cached';
+        loadingText.textContent = 'Loaded from data/signals.json';
+        updatedEl.textContent = `↻ UPDATED ${d.toUTCString().replace('GMT', 'UTC').toUpperCase()}`;
+      } else {
+        const cachedSignals = sessionStorage.getItem(`tankrich_signals_${todayKey()}`);
+        if (cachedSignals) {
+          const obj = JSON.parse(cachedSignals);
+          allMarkets = obj.markets;
+          loadingText.textContent = 'Loaded from session cache';
+          const d = new Date(obj.generated_at);
+          updatedEl.textContent = `↻ UPDATED ${d.toUTCString().replace('GMT', 'UTC').toUpperCase()}`;
+        } else {
+          allMarkets = await loadLive();
+          const d = new Date();
+          updatedEl.textContent = `↻ UPDATED ${d.toUTCString().replace('GMT', 'UTC').toUpperCase()}`;
+          sourceBadge.textContent = 'LIVE DATA';
+          sourceBadge.className = 'badge live';
+        }
+      }
+      renderFilters();
+      renderCards();
+    }
+
+    init();
+  </script>
+</body>
+</html>
