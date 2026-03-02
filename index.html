@@ -395,13 +395,17 @@
         entry_date: null,
         stop_loss: null,
         return_pct: null,
+        signal_age_days: null,
       };
 
       if ((signal === 'LONG' || signal === 'WATCH') && entry) {
+        const entryTs = close.timestamps ? close.timestamps[entry.idx] * 1000 : Date.now();
+        const currentTs = close.timestamps ? close.timestamps[i] * 1000 : Date.now();
         current.entry_price = entry.price;
-        current.entry_date = new Date(close.timestamps ? close.timestamps[entry.idx] * 1000 : Date.now()).toISOString().slice(0, 10);
+        current.entry_date = new Date(entryTs).toISOString().slice(0, 10);
         current.stop_loss = entry.price - (2 * entry.atr);
         current.return_pct = ((close[i] - entry.price) / entry.price) * 100;
+        current.signal_age_days = Math.max(0, Math.floor((currentTs - entryTs) / 86400000));
       }
 
       return current;
@@ -528,10 +532,11 @@
         const s = m.signal.toLowerCase();
         const chgClass = m.weekly_change_pct >= 0 ? 'up' : 'down';
         const spark = normaliseSpark(m.sparkline);
-        const durationText = (m.signal !== 'FLAT' && m.entry_date) ? ` <span class="duration">↑ ${Math.max(0, Math.floor((new Date(generatedAtISO) - new Date(m.entry_date + 'T00:00:00Z')) / 86400000))}d</span>` : '';
+        const hasSignalDuration = Number.isFinite(m.signal_age_days);
+        const durationBadge = m.signal === 'FLAT' ? '' : ` <span class="duration">↑ ${hasSignalDuration ? m.signal_age_days : '--'}d</span>`;
         const detail = m.signal === 'FLAT'
           ? `<div class="detail muted">No active position.</div>`
-          : `<div class="detail"><div class="mobile-inline">Entry ${m.entry_date} / Stop ${formatNum(m.stop_loss)}</div><div>Entry&nbsp;&nbsp;${m.entry_date} @ ${formatNum(m.entry_price)}</div><div>Stop&nbsp;&nbsp;&nbsp;${formatNum(m.stop_loss)}&nbsp;&nbsp;&nbsp;Return ${m.return_pct>=0?'+':''}${formatNum(m.return_pct)}%${durationText}</div></div>`;
+          : `<div class="detail"><div class="mobile-inline">Entry ${m.entry_date ?? '--'} / Stop ${formatNum(m.stop_loss)}</div><div>Entry&nbsp;&nbsp;${m.entry_date ?? '--'} @ ${formatNum(m.entry_price)}</div><div>Stop&nbsp;&nbsp;&nbsp;${formatNum(m.stop_loss)}&nbsp;&nbsp;&nbsp;Return ${m.return_pct>=0?'+':''}${formatNum(m.return_pct)}%${durationBadge}</div></div>`;
         const rsiLabel = m.rsi_divergence ? '<span class="rsi-warn">RSI ⚡ DIV</span>' : (m.rsi_weakening ? '<span class="rsi-warn">RSI ↘ SLOPE</span>' : `RSI ${formatNum(m.rsi,0)}`);
         const sparkColor = m.signal === 'FLAT' ? 'var(--accent-flat-spark)' : `var(--accent-${s})`;
         const gradientId = `spark-${m.ticker.replace(/[^a-zA-Z0-9]/g,'')}`;
