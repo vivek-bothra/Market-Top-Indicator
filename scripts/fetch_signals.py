@@ -119,6 +119,7 @@ def calculate_signal(df: pd.DataFrame) -> dict:
         "current_price": round(current, 2),
         "weekly_change_pct": round(((current - previous) / previous) * 100, 2),
         "entry_date": None,
+        "signal_age_days": None,
         "entry_price": None,
         "stop_loss": None,
         "return_pct": None,
@@ -137,6 +138,9 @@ def calculate_signal(df: pd.DataFrame) -> dict:
 
     if current_state in {"LONG", "WATCH"} and entry_price is not None and entry_atr is not None:
         payload["entry_date"] = entry_date
+        entry_ts = pd.Timestamp(entry_date)
+        current_ts = pd.Timestamp(df.index[-1]).tz_localize(None).normalize()
+        payload["signal_age_days"] = int(max(0, (current_ts - entry_ts).days))
         payload["entry_price"] = round(entry_price, 2)
         payload["stop_loss"] = round(entry_price - 2 * entry_atr, 2)
         payload["return_pct"] = round(((current - entry_price) / entry_price) * 100, 2)
