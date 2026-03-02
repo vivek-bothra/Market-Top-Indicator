@@ -30,8 +30,12 @@ The page loads data in this priority:
 
 Signal states:
 - **LONG**: EMA10 > EMA20 and MACD > signal
-- **WATCH**: EMA10 > EMA20 and (MACD < signal or RSI > 70)
+- **WATCH**: EMA10 > EMA20 and (MACD < signal or RSI warning)
 - **FLAT**: EMA10 < EMA20
+
+RSI warning is triggered when either:
+- Bearish RSI divergence appears (price makes a higher high while RSI makes a lower high over the prior 10 bars)
+- RSI momentum slope weakens from elevated levels (`RSI > 55` and 3-bar slope `< -6`)
 
 Entry is recorded when state transitions from non-LONG to LONG.
 

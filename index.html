@@ -17,9 +17,10 @@
       --accent-long: #c8f060;
       --accent-watch: #f0a030;
       --accent-flat: #ff4444;
-      --accent-long-dim: #1a2010;
-      --accent-watch-dim: #201808;
-      --accent-flat-dim: #1a0808;
+      --accent-flat-spark: #444440;
+      --accent-long-dim: #0d1208;
+      --accent-watch-dim: #130e04;
+      --accent-flat-dim: #0a0a0a;
     }
 
     * { box-sizing: border-box; }
@@ -41,12 +42,12 @@
       letter-spacing: 0.3em;
       font-size: 0.7rem;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin-bottom: 18px;
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      margin: 0 0 8px 0;
+      font-size: clamp(2rem, 5vw, 3.5rem);
       letter-spacing: 0.03em;
     }
 
@@ -68,6 +69,12 @@
     .badge.live { color: var(--accent-watch); border-color: var(--accent-watch); }
     .badge.cached { color: var(--accent-long); border-color: var(--accent-long); }
 
+    .meta-wrap {
+      border-bottom: 1px solid #1a1a1a;
+      margin-bottom: 2rem;
+      padding-bottom: 10px;
+    }
+
     .methodology {
       color: var(--text-muted);
       text-decoration: none;
@@ -75,26 +82,28 @@
     }
 
     .filter-bar {
-      margin: 20px 0;
+      margin: 20px 0 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
     .filter-btn {
-      background: transparent;
+      background: #111111;
       color: var(--text-muted);
-      border: 1px solid var(--border);
+      border: 1px solid #222;
       padding: 7px 11px;
       cursor: pointer;
       font-family: inherit;
       font-size: 0.78rem;
     }
 
-    .filter-btn.active[data-filter="all"] { color: var(--text-primary); border-color: var(--text-primary); }
-    .filter-btn.active[data-filter="LONG"] { color: var(--accent-long); border-color: var(--accent-long); }
-    .filter-btn.active[data-filter="WATCH"] { color: var(--accent-watch); border-color: var(--accent-watch); }
-    .filter-btn.active[data-filter="FLAT"] { color: var(--accent-flat); border-color: var(--accent-flat); }
+     .filter-btn sup { font-size: 0.65rem; margin-left: 2px; }
+    .filter-btn.active { border-color: transparent; color: #0a0a0a; }
+    .filter-btn.active[data-filter="all"] { background: #e8e8e0; }
+    .filter-btn.active[data-filter="LONG"] { background: var(--accent-long); }
+    .filter-btn.active[data-filter="WATCH"] { background: var(--accent-watch); }
+    .filter-btn.active[data-filter="FLAT"] { background: var(--accent-flat); }
 
     .grid {
       display: grid;
@@ -106,13 +115,13 @@
     .card {
       background: var(--surface);
       padding: 14px;
-      min-height: 210px;
+      min-height: 220px;
       border-left: 1px solid var(--border);
       position: relative;
     }
-    .card.long { background: var(--accent-long-dim); border-left-color: var(--accent-long); }
-    .card.watch { background: var(--accent-watch-dim); border-left-color: var(--accent-watch); }
-    .card.flat { background: var(--accent-flat-dim); border-left-color: var(--accent-flat); }
+    .card.long { background: var(--accent-long-dim); border-left: 2px solid var(--accent-long); border-top: 1px solid #1e2e10; }
+    .card.watch { background: var(--accent-watch-dim); border-left: 2px solid var(--accent-watch); animation: watchPulse 3s ease-in-out infinite; }
+    .card.flat { background: var(--accent-flat-dim); border-left: 1px solid #2a1010; opacity: 0.75; }
 
     .card-top {
       display: flex;
@@ -140,8 +149,8 @@
       position: absolute;
       top: 12px;
       right: 12px;
-      width: 80px;
-      height: 28px;
+      width: 100px;
+      height: 36px;
     }
 
     .price-row {
@@ -153,6 +162,16 @@
     }
 
     .price { font-size: 1.05rem; font-weight: 700; }
+    .card.long .price { color: var(--accent-long); }
+    .card.watch .price { color: var(--accent-watch); }
+    .card.flat .price { color: #666660; }
+    .duration { font-size: 0.7rem; margin-left: 8px; }
+    .pill { padding: 2px 6px; border-radius: 999px; font-size: 0.72rem; }
+    .pill.up { background: rgba(200,240,96,0.15); }
+    .pill.down { background: rgba(255,68,68,0.15); }
+    .rsi-warn { color: var(--accent-watch); }
+    .insight { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin: 0 0 16px; }
+    .mobile-inline { display: none; }
     .chg.up { color: var(--accent-long); }
     .chg.down { color: var(--accent-flat); }
 
@@ -180,6 +199,11 @@
       50% { opacity: 0.5; }
     }
 
+    @keyframes watchPulse {
+      0%, 100% { border-left-color: #f0a030; }
+      50% { border-left-color: #7a5018; }
+    }
+
     .retry {
       margin-top: 10px;
       background: transparent;
@@ -189,6 +213,15 @@
       font-size: 0.72rem;
       padding: 4px 8px;
       cursor: pointer;
+    }
+
+    @media (max-width: 375px) {
+      .card { min-height: auto; }
+      .sparkline { position: static; width: 100%; height: 36px; margin-top: 8px; }
+      .card-top { padding-right: 0; }
+      .mobile-inline { display: block; }
+      .indicators { display: none; }
+      .card.expanded .indicators { display: block; }
     }
 
     footer {
@@ -203,19 +236,20 @@
   <main class="app">
     <div class="topline">TANKRICH</div>
     <h1>MARKET TOP SIGNALS</h1>
-    <div class="meta">
+    <div class="meta-wrap"><div class="meta">
       <span id="updated">↻ UPDATED --</span>
       <span id="sourceBadge" class="badge live">LIVE DATA</span>
       <span id="loadingText">Loading markets... (0/13)</span>
       <a class="methodology" href="#method">Methodology</a>
-    </div>
+    </div></div>
 
     <div class="filter-bar" id="filters"></div>
+    <div class="insight" id="insightLine"></div>
     <section class="grid" id="grid"></section>
 
     <footer id="method">
       <div>Signals auto-generated every Monday 09:00 UTC.</div>
-      <div>Data: Yahoo Finance (unofficial) · Strategy: EMA/MACD/RSI Market Top Detector.</div>
+      <div>Data: Yahoo Finance (unofficial) · Strategy: EMA/MACD/RSI-Divergence Market Top Detector.</div>
       <div>⚠ NIFTY 50 used as India broad market proxy — NIFTY 500 not available via Yahoo Finance.</div>
       <div>Not financial advice. For educational purposes only.</div>
     </footer>
@@ -242,9 +276,11 @@
     const loadingText = document.getElementById('loadingText');
     const updatedEl = document.getElementById('updated');
     const sourceBadge = document.getElementById('sourceBadge');
+    const insightLine = document.getElementById('insightLine');
 
     let allMarkets = [];
     let activeFilter = 'all';
+    let generatedAtISO = new Date().toISOString();
 
     function todayKey() { return new Date().toISOString().slice(0, 10); }
 
@@ -294,7 +330,7 @@
 
     function normaliseSpark(values) {
       const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
-      return values.map((v, i) => `${(i / (values.length - 1)) * 80},${28 - ((v - min) / span) * 28}`).join(' ');
+      return values.map((v, i) => `${(i / (values.length - 1)) * 100},${36 - ((v - min) / span) * 36}`).join(' ');
     }
 
     function buildSignalSeries(close, high, low) {
@@ -312,7 +348,15 @@
 
       for (let i = warmup; i < close.length; i++) {
         const isLong = e10[i] > e20[i] && macd[i] > macdSig[i];
-        const isWatch = e10[i] > e20[i] && (macd[i] < macdSig[i] || rsi[i] > 70);
+        const priceHighRecent = i >= 9 ? Math.max(...close.slice(i - 4, i + 1)) : null;
+        const priceHighPrev = i >= 9 ? Math.max(...close.slice(i - 9, i - 4)) : null;
+        const rsiHighRecent = i >= 9 ? Math.max(...rsi.slice(i - 4, i + 1)) : null;
+        const rsiHighPrev = i >= 9 ? Math.max(...rsi.slice(i - 9, i - 4)) : null;
+        const rsiDivergence = i >= 9 && priceHighRecent > priceHighPrev && rsiHighRecent < rsiHighPrev;
+        const rsiSlope = i >= 3 ? rsi[i] - rsi[i - 3] : 0;
+        const rsiWeakening = rsi[i] > 55 && rsiSlope < -6;
+        const rsiWarning = rsiDivergence || rsiWeakening;
+        const isWatch = e10[i] > e20[i] && (macd[i] < macdSig[i] || rsiWarning);
         const state = isLong ? 'LONG' : (isWatch ? 'WATCH' : 'FLAT');
         if (state === 'LONG' && lastState !== 'LONG') {
           entry = { idx: i, price: close[i], atr: atr[i] };
@@ -322,7 +366,15 @@
 
       const i = close.length - 1;
       const isLong = e10[i] > e20[i] && macd[i] > macdSig[i];
-      const isWatch = e10[i] > e20[i] && (macd[i] < macdSig[i] || rsi[i] > 70);
+      const priceHighRecent = i >= 9 ? Math.max(...close.slice(i - 4, i + 1)) : null;
+        const priceHighPrev = i >= 9 ? Math.max(...close.slice(i - 9, i - 4)) : null;
+        const rsiHighRecent = i >= 9 ? Math.max(...rsi.slice(i - 4, i + 1)) : null;
+        const rsiHighPrev = i >= 9 ? Math.max(...rsi.slice(i - 9, i - 4)) : null;
+        const rsiDivergence = i >= 9 && priceHighRecent > priceHighPrev && rsiHighRecent < rsiHighPrev;
+        const rsiSlope = i >= 3 ? rsi[i] - rsi[i - 3] : 0;
+        const rsiWeakening = rsi[i] > 55 && rsiSlope < -6;
+        const rsiWarning = rsiDivergence || rsiWeakening;
+        const isWatch = e10[i] > e20[i] && (macd[i] < macdSig[i] || rsiWarning);
       const signal = isLong ? 'LONG' : (isWatch ? 'WATCH' : 'FLAT');
 
       const current = {
@@ -332,6 +384,10 @@
         rsi: rsi[i],
         macd_line: macd[i],
         macd_signal: macdSig[i],
+        rsi_divergence: rsiDivergence,
+        rsi_weakening: rsiWeakening,
+        rsi_slope: rsiSlope,
+        rsi_warning: rsiWarning,
         atr: atr[i],
         entry_price: null,
         entry_date: null,
@@ -442,14 +498,23 @@
         FLAT: allMarkets.filter(m => m.signal === 'FLAT').length,
       };
       const rows = [
-        ['all', `ALL ${counts.all}`],
-        ['LONG', `● LONG ${counts.LONG}`],
-        ['WATCH', `◐ WATCH ${counts.WATCH}`],
-        ['FLAT', `○ FLAT ${counts.FLAT}`],
+        ['all', `ALL<sup>${counts.all}</sup>`],
+        ['LONG', `LONG<sup>${counts.LONG}</sup>`],
+        ['WATCH', `WATCH<sup>${counts.WATCH}</sup>`],
+        ['FLAT', `FLAT<sup>${counts.FLAT}</sup>`],
       ];
       const el = document.getElementById('filters');
-      el.innerHTML = rows.map(([key, label]) => `<button class="filter-btn ${activeFilter===key?'active':''}" data-filter="${key}">[ ${label} ]</button>`).join('');
+      el.innerHTML = rows.map(([key, label]) => `<button class="filter-btn ${activeFilter===key?'active':''}" data-filter="${key}">${label}</button>`).join('');
       el.querySelectorAll('button').forEach(btn => btn.onclick = () => { activeFilter = btn.dataset.filter; renderCards(); renderFilters(); });
+    }
+
+    function renderInsight() {
+      const longCount = allMarkets.filter(m => m.signal === 'LONG').length;
+      const watchCount = allMarkets.filter(m => m.signal === 'WATCH').length;
+      const flatCount = allMarkets.filter(m => m.signal === 'FLAT').length;
+      if (longCount >= 8) insightLine.textContent = 'Markets broadly trending. Majority of indexes in confirmed uptrends.';
+      else if (flatCount >= 8) insightLine.textContent = 'Risk-off conditions. Most major indexes below trend.';
+      else insightLine.textContent = `Mixed signals across markets. ${longCount} trending, ${watchCount} watching, ${flatCount} flat.`;
     }
 
     function renderCards() {
@@ -461,23 +526,28 @@
         const s = m.signal.toLowerCase();
         const chgClass = m.weekly_change_pct >= 0 ? 'up' : 'down';
         const spark = normaliseSpark(m.sparkline);
+        const durationText = (m.signal !== 'FLAT' && m.entry_date) ? ` <span class="duration">↑ ${Math.max(0, Math.floor((new Date(generatedAtISO) - new Date(m.entry_date + 'T00:00:00Z')) / 86400000))}d</span>` : '';
         const detail = m.signal === 'FLAT'
           ? `<div class="detail muted">No active position.</div>`
-          : `<div class="detail"><div>Entry&nbsp;&nbsp;${m.entry_date} @ ${formatNum(m.entry_price)}</div><div>Stop&nbsp;&nbsp;&nbsp;${formatNum(m.stop_loss)}&nbsp;&nbsp;&nbsp;Return ${m.return_pct>=0?'+':''}${formatNum(m.return_pct)}%</div></div>`;
+          : `<div class="detail"><div class="mobile-inline">Entry ${m.entry_date} / Stop ${formatNum(m.stop_loss)}</div><div>Entry&nbsp;&nbsp;${m.entry_date} @ ${formatNum(m.entry_price)}</div><div>Stop&nbsp;&nbsp;&nbsp;${formatNum(m.stop_loss)}&nbsp;&nbsp;&nbsp;Return ${m.return_pct>=0?'+':''}${formatNum(m.return_pct)}%${durationText}</div></div>`;
+        const rsiLabel = m.rsi_divergence ? '<span class="rsi-warn">RSI ⚡ DIV</span>' : (m.rsi_weakening ? '<span class="rsi-warn">RSI ↘ SLOPE</span>' : `RSI ${formatNum(m.rsi,0)}`);
+        const sparkColor = m.signal === 'FLAT' ? 'var(--accent-flat-spark)' : `var(--accent-${s})`;
+        const gradientId = `spark-${m.ticker.replace(/[^a-zA-Z0-9]/g,'')}`;
         return `<article class="card ${s}">
-          <svg class="sparkline" viewBox="0 0 80 28"><line x1="0" y1="14" x2="80" y2="14" stroke="var(--border)" stroke-width="1"/><polyline points="${spark}" fill="none" stroke="var(--accent-${s})" stroke-width="1.5"/></svg>
+          <svg class="sparkline" viewBox="0 0 100 36"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${sparkColor}" stop-opacity="0.2"/><stop offset="100%" stop-color="${sparkColor}" stop-opacity="0"/></linearGradient></defs><line x1="0" y1="18" x2="100" y2="18" stroke="var(--border)" stroke-width="1"/><polyline points="${spark} 100,36 0,36" fill="url(#${gradientId})" stroke="none"/><polyline points="${spark}" fill="none" stroke="${sparkColor}" stroke-width="2"/></svg>
           <div class="card-top">
             <div><div class="market-name">${m.flag} ${m.name}</div><div class="ticker">${m.ticker} · ${m.region}</div></div>
             <span class="signal ${s}">${m.signal}</span>
           </div>
-          <div class="price-row"><div class="price">${formatNum(m.current_price)} ${m.currency}</div><div class="chg ${chgClass}">${m.weekly_change_pct>=0?'▲':'▼'} ${m.weekly_change_pct>=0?'+':''}${formatNum(m.weekly_change_pct)}% this week</div></div>
+          <div class="price-row"><div class="price">${formatNum(m.current_price)} ${m.currency}</div><div class="chg ${chgClass}"><span class="pill ${chgClass}">${m.weekly_change_pct>=0?'▲':'▼'} ${m.weekly_change_pct>=0?'+':''}${formatNum(m.weekly_change_pct)}%</span> this week</div></div>
           <div class="sep"></div>
           ${detail}
           <div class="sep"></div>
-          <div class="indicators">EMA10 ${formatNum(m.ema_short,0)} · EMA20 ${formatNum(m.ema_long,0)} · RSI ${formatNum(m.rsi,0)}</div>
+          <div class="indicators">EMA10 ${formatNum(m.ema_short,0)} · EMA20 ${formatNum(m.ema_long,0)} · ${rsiLabel}</div>
         </article>`;
       }).join('');
 
+      grid.querySelectorAll('.card').forEach(card => { card.onclick = () => card.classList.toggle('expanded'); });
       grid.querySelectorAll('.retry').forEach(btn => {
         btn.onclick = async () => {
           const ticker = btn.dataset.ticker;
@@ -485,7 +555,7 @@
           const rows = await fetchWithFallback(ticker);
           if (!rows) return;
           allMarkets[idx] = buildMarketFromRows(MARKETS.find(m => m.ticker===ticker), rows);
-          renderFilters(); renderCards();
+          renderFilters(); renderInsight(); renderCards();
         };
       });
     }
@@ -521,7 +591,7 @@
     }
 
     function renderSkeletons() {
-      grid.innerHTML = Array.from({ length: 9 }).map(() => `<article class="card skeleton"></article>`).join('');
+      grid.innerHTML = Array.from({ length: 9 }).map(() => `<article class="card"><div class="skeleton" style="width:60px;height:20px;position:absolute;top:12px;right:12px;"></div><div class="skeleton" style="width:140px;height:24px;margin-top:54px;"></div><div class="skeleton" style="width:200px;height:14px;margin-top:18px;"></div><div class="skeleton" style="width:200px;height:14px;margin-top:10px;"></div></article>`).join('');
     }
 
     async function loadLive() {
@@ -556,6 +626,7 @@
       const json = await loadSignalsJSON();
       if (json) {
         allMarkets = json.markets;
+        generatedAtISO = json.generated_at;
         const d = new Date(json.generated_at);
         sourceBadge.textContent = `CACHED · ${d.toUTCString().slice(0, 16).toUpperCase()}`;
         sourceBadge.className = 'badge cached';
@@ -566,11 +637,13 @@
         if (cachedSignals) {
           const obj = JSON.parse(cachedSignals);
           allMarkets = obj.markets;
+          generatedAtISO = obj.generated_at;
           loadingText.textContent = 'Loaded from session cache';
           const d = new Date(obj.generated_at);
           updatedEl.textContent = `↻ UPDATED ${d.toUTCString().replace('GMT', 'UTC').toUpperCase()}`;
         } else {
           allMarkets = await loadLive();
+          generatedAtISO = new Date().toISOString();
           const d = new Date();
           updatedEl.textContent = `↻ UPDATED ${d.toUTCString().replace('GMT', 'UTC').toUpperCase()}`;
           sourceBadge.textContent = 'LIVE DATA';
@@ -578,6 +651,7 @@
         }
       }
       renderFilters();
+      renderInsight();
       renderCards();
     }
 

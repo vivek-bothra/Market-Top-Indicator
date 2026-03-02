@@ -65,13 +65,38 @@ def calculate_signal(df: pd.DataFrame) -> dict:
     atr = atr_wilder(high, low, close, 14)
 
     signal_series = []
+    rsi_divergence_series = []
+    rsi_weakening_series = []
+    rsi_slope_series = []
+    rsi_warning_series = []
     for i in range(len(df)):
       if i < 52:
           signal_series.append("FLAT")
+          rsi_divergence_series.append(False)
+          rsi_weakening_series.append(False)
+          rsi_slope_series.append(0.0)
+          rsi_warning_series.append(False)
           continue
+      if i >= 9:
+          price_high_recent = float(close.iloc[i - 4:i + 1].max())
+          price_high_prev = float(close.iloc[i - 9:i - 4].max())
+          rsi_high_recent = float(rsi.iloc[i - 4:i + 1].max())
+          rsi_high_prev = float(rsi.iloc[i - 9:i - 4].max())
+          rsi_divergence = price_high_recent > price_high_prev and rsi_high_recent < rsi_high_prev
+      else:
+          rsi_divergence = False
+
+      rsi_slope = float(rsi.iloc[i] - rsi.iloc[i - 3]) if i >= 3 else 0.0
+      rsi_weakening = bool(rsi.iloc[i] > 55 and rsi_slope < -6)
+      rsi_warning = bool(rsi_divergence or rsi_weakening)
+
       is_long = ema10.iloc[i] > ema20.iloc[i] and macd_line.iloc[i] > macd_signal.iloc[i]
-      is_watch = ema10.iloc[i] > ema20.iloc[i] and (macd_line.iloc[i] < macd_signal.iloc[i] or rsi.iloc[i] > 70)
+      is_watch = ema10.iloc[i] > ema20.iloc[i] and (macd_line.iloc[i] < macd_signal.iloc[i] or rsi_warning)
       signal_series.append("LONG" if is_long else ("WATCH" if is_watch else "FLAT"))
+      rsi_divergence_series.append(bool(rsi_divergence))
+      rsi_weakening_series.append(rsi_weakening)
+      rsi_slope_series.append(rsi_slope)
+      rsi_warning_series.append(rsi_warning)
 
     entry_date = None
     entry_price = None
@@ -99,6 +124,10 @@ def calculate_signal(df: pd.DataFrame) -> dict:
         "ema_short": round(float(ema10.iloc[-1]), 2),
         "ema_long": round(float(ema20.iloc[-1]), 2),
         "rsi": round(float(rsi.iloc[-1]), 2),
+        "rsi_divergence": bool(rsi_divergence_series[-1]),
+        "rsi_weakening": bool(rsi_weakening_series[-1]),
+        "rsi_slope": round(float(rsi_slope_series[-1]), 2),
+        "rsi_warning": bool(rsi_warning_series[-1]),
         "macd_line": round(float(macd_line.iloc[-1]), 2),
         "macd_signal": round(float(macd_signal.iloc[-1]), 2),
         "atr": round(float(atr.iloc[-1]), 2),
