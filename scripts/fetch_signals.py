@@ -153,6 +153,19 @@ def fetch_ticker(ticker: str) -> pd.DataFrame:
         time.sleep(1)
     df = yf.download(ticker, auto_adjust=True, interval="1wk", period="2y", progress=False)
     if df.empty:
+        # Some Yahoo index feeds (e.g., ^KS11) intermittently fail on direct weekly bars.
+        # Fall back to daily bars and rebuild weekly OHLCV locally.
+        daily = yf.download(ticker, auto_adjust=True, interval="1d", period="2y", progress=False)
+        if not daily.empty:
+            daily = daily[["Open", "High", "Low", "Close", "Volume"]].copy().ffill(limit=2).dropna()
+            df = daily.resample("W-FRI").agg({
+                "Open": "first",
+                "High": "max",
+                "Low": "min",
+                "Close": "last",
+                "Volume": "sum",
+            }).dropna()
+    if df.empty:
         raise ValueError(f"No data for {ticker}")
     df = df[["Open", "High", "Low", "Close", "Volume"]].copy()
     df = df.ffill(limit=2).dropna()
