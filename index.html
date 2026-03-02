@@ -14,11 +14,11 @@
       --border: #222222;
       --text-primary: #e8e8e0;
       --text-muted: #666660;
-      --accent-long: #c8f060;
+      --accent-long: #6bdc7d;
       --accent-watch: #f0a030;
       --accent-flat: #ff4444;
       --accent-flat-spark: #444440;
-      --accent-long-dim: #0d1208;
+      --accent-long-dim: #09140d;
       --accent-watch-dim: #130e04;
       --accent-flat-dim: #0a0a0a;
     }
@@ -234,12 +234,12 @@
 </head>
 <body>
   <main class="app">
-    <div class="topline">TANKRICH</div>
-    <h1>MARKET TOP SIGNALS</h1>
+    <div class="topline" style="color: var(--accent-long);">Tankrich</div>
+    <h1>GLOBAL MOMENTUM DASHBOARD</h1>
     <div class="meta-wrap"><div class="meta">
       <span id="updated">↻ UPDATED --</span>
       <span id="sourceBadge" class="badge live">LIVE DATA</span>
-      <span id="loadingText">Loading markets... (0/13)</span>
+      <span id="loadingText">Loading markets... (0/14)</span>
       <a class="methodology" href="#method">Methodology</a>
     </div></div>
 
@@ -250,6 +250,7 @@
     <footer id="method">
       <div>Signals auto-generated every Monday 09:00 UTC.</div>
       <div>Data: Yahoo Finance (unofficial) · Strategy: EMA/MACD/RSI-Divergence Market Top Detector.</div>
+      <div>Signal guide in plain English: <strong>LONG</strong> = trend is still rising, <strong>WATCH</strong> = trend is up but momentum is weakening, <strong>FLAT</strong> = no active long setup right now.</div>
       <div>⚠ NIFTY 50 used as India broad market proxy — NIFTY 500 not available via Yahoo Finance.</div>
       <div>Not financial advice. For educational purposes only.</div>
     </footer>
@@ -269,7 +270,8 @@
       { ticker: '^AXJO', name: 'ASX 200', region: 'Australia', flag: '🇦🇺', currency: 'AUD' },
       { ticker: '^NSEI', name: 'NIFTY 50 (India Broad Proxy)', region: 'India', flag: '🇮🇳', currency: 'INR' },
       { ticker: 'NIFTYSMLCAP250.NS', name: 'NIFTY Smallcap 250', region: 'India', flag: '🇮🇳', currency: 'INR' },
-      { ticker: '^BVSP', name: 'Bovespa', region: 'Brazil', flag: '🇧🇷', currency: 'BRL' }
+      { ticker: '^BVSP', name: 'Bovespa', region: 'Brazil', flag: '🇧🇷', currency: 'BRL' },
+      { ticker: '^KS11', name: 'KOSPI', region: 'South Korea', flag: '🇰🇷', currency: 'KRW' }
     ];
 
     const grid = document.getElementById('grid');
@@ -604,11 +606,11 @@
           const key = `tankrich_${meta.ticker}_${cacheDate}`;
           const cached = sessionStorage.getItem(key);
           if (cached) {
-            done++; loadingText.textContent = `Loading markets... (${done}/13)`;
+            done++; loadingText.textContent = `Loading markets... (${done}/${MARKETS.length})`;
             return JSON.parse(cached);
           }
           const rows = await fetchWithFallback(meta.ticker);
-          done++; loadingText.textContent = `Loading markets... (${done}/13)`;
+          done++; loadingText.textContent = `Loading markets... (${done}/${MARKETS.length})`;
           if (!rows) return { ...meta, signal: 'FLAT', error: true };
           const market = buildMarketFromRows(meta, rows);
           sessionStorage.setItem(key, JSON.stringify(market));

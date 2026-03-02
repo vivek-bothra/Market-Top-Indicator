@@ -599,6 +599,33 @@
       "rsi_weakening": false,
       "rsi_slope": 0.0,
       "rsi_warning": false
+    },
+    {
+      "ticker": "^KS11",
+      "name": "KOSPI",
+      "region": "South Korea",
+      "flag": "\ud83c\uddf0\ud83c\uddf7",
+      "currency": "KRW",
+      "signal": "FLAT",
+      "current_price": 0.0,
+      "weekly_change_pct": 0.0,
+      "entry_date": null,
+      "entry_price": null,
+      "stop_loss": null,
+      "return_pct": null,
+      "ema_short": 0.0,
+      "ema_long": 0.0,
+      "rsi": 0.0,
+      "rsi_divergence": false,
+      "rsi_weakening": false,
+      "rsi_slope": 0.0,
+      "rsi_warning": false,
+      "macd_line": 0.0,
+      "macd_signal": 0.0,
+      "atr": 0.0,
+      "sparkline": [
+        0.0
+      ]
     }
   ]
 }

@@ -4,7 +4,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import yfinance as yf
 
@@ -22,6 +21,7 @@ MARKETS = [
     {"ticker": "^NSEI", "name": "NIFTY 50 (India Broad Proxy)", "region": "India", "flag": "🇮🇳", "currency": "INR"},
     {"ticker": "NIFTYSMLCAP250.NS", "name": "NIFTY Smallcap 250", "region": "India", "flag": "🇮🇳", "currency": "INR"},
     {"ticker": "^BVSP", "name": "Bovespa", "region": "Brazil", "flag": "🇧🇷", "currency": "BRL"},
+    {"ticker": "^KS11", "name": "KOSPI", "region": "South Korea", "flag": "🇰🇷", "currency": "KRW"},
 ]
 
 
@@ -35,7 +35,8 @@ def rsi_wilder(close: pd.Series, period: int = 14) -> pd.Series:
     loss = (-delta).clip(lower=0)
     avg_gain = gain.ewm(alpha=1 / period, adjust=False, min_periods=period).mean()
     avg_loss = loss.ewm(alpha=1 / period, adjust=False, min_periods=period).mean()
-    rs = avg_gain / avg_loss.replace(0, np.nan)
+    avg_loss_safe = avg_loss.where(avg_loss != 0)
+    rs = avg_gain / avg_loss_safe
     rsi = 100 - (100 / (1 + rs))
     return rsi.fillna(100)
 
